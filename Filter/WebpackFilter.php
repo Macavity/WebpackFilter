@@ -64,17 +64,20 @@ class WebpackFilter extends BaseNodeFilter
         } else {
             $templateName = 'asset';
         }
+        echo "\ntemplateName: $templateName";
 
         $inputDirPath = FilesystemUtils::createThrowAwayDirectory('webpack_in');
         $inputPath = $inputDirPath.DIRECTORY_SEPARATOR.$templateName.'.js';
         $outputPath = FilesystemUtils::createTemporaryFile('webpack_out');
 
         file_put_contents($inputPath, $asset->getContent());
+        echo "\nCopy file to $inputPath";
 
-        $pb->add($inputPath)->add('--out')->add($outputPath);
         if($this->configFile) {
             $pb->add('--config')->add($this->configFile);
         }
+
+        $pb->add($inputPath)->add($outputPath);
 
         $proc = $pb->getProcess();
         $code = $proc->run();
