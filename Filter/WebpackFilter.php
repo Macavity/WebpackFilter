@@ -17,12 +17,35 @@ use Assetic\Util\FilesystemUtils;
 
 class WebpackFilter extends BaseNodeFilter
 {
+    /**
+     * Path to the webpack binary
+     * @var string
+     */
+    private $webpackBin;
+
+    /**
+     * Path to the node binary
+     * @var null
+     */
+    private $nodeBin;
+
+    /**
+     * Path to the config file
+     * @var
+     */
+    private $configFile;
+
     public function __construct($webpackBin = '/usr/bin/webpack', $nodeBin = null)
     {
         $this->webpackBin = $webpackBin;
         $this->nodeBin = $nodeBin;
 
         $this->addNodePath(dirname(dirname(realpath($webpackBin))));
+    }
+
+    public function setConfigFile($configFilePath)
+    {
+        $this->configFile = $configFilePath;
     }
 
     /**
@@ -49,6 +72,9 @@ class WebpackFilter extends BaseNodeFilter
         file_put_contents($inputPath, $asset->getContent());
 
         $pb->add($inputPath)->add('--out')->add($outputPath);
+        if($this->configFile) {
+            $pb->add('--config')->add($this->configFile);
+        }
 
         $proc = $pb->getProcess();
         $code = $proc->run();
