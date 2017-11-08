@@ -11,7 +11,9 @@
 namespace Macavity\Assetic\Filter;
 
 use Assetic\Asset\AssetInterface;
+use Assetic\Exception\FilterException;
 use Assetic\Filter\BaseNodeFilter;
+use Assetic\Util\FilesystemUtils;
 
 class WebpackFilter extends BaseNodeFilter
 {
@@ -31,8 +33,8 @@ class WebpackFilter extends BaseNodeFilter
     public function filterLoad(AssetInterface $asset)
     {
         $pb = $this->createProcessBuilder($this->nodeBin
-            ? array($this->nodeBin, $this->tscBin)
-            : array($this->tscBin));
+            ? array($this->nodeBin, $this->webpackBin)
+            : array($this->webpackBin));
 
         if ($sourcePath = $asset->getSourcePath()) {
             $templateName = basename($sourcePath);
@@ -40,9 +42,9 @@ class WebpackFilter extends BaseNodeFilter
             $templateName = 'asset';
         }
 
-        $inputDirPath = FilesystemUtils::createThrowAwayDirectory('typescript_in');
-        $inputPath = $inputDirPath.DIRECTORY_SEPARATOR.$templateName.'.ts';
-        $outputPath = FilesystemUtils::createTemporaryFile('typescript_out');
+        $inputDirPath = FilesystemUtils::createThrowAwayDirectory('webpack_in');
+        $inputPath = $inputDirPath.DIRECTORY_SEPARATOR.$templateName.'.js';
+        $outputPath = FilesystemUtils::createTemporaryFile('webpack_out');
 
         file_put_contents($inputPath, $asset->getContent());
 
